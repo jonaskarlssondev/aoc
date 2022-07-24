@@ -23,7 +23,6 @@ func one(xInc, yInc int) int {
 
 	for y := yInc; y < len(input); y += yInc {
 		line := input[y]
-		//fmt.Printf("%s\n", line)
 
 		x = (x + xInc) % len(line)
 
