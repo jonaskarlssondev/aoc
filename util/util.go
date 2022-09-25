@@ -2,6 +2,7 @@ package util
 
 import (
 	"bufio"
+	"errors"
 	"os"
 	"strconv"
 	"strings"
@@ -42,4 +43,52 @@ func ToIntArray(s []string) ([]int, error) {
 	}
 
 	return arr, nil
+}
+
+// TwoSum tries to find two numbers in a, that add up to sum.
+func TwoSum(sum int, a []int) (int, int, error) {
+	found := make(map[int]bool)
+	for _, num := range a {
+		diff := sum - num
+
+		if found[diff] {
+			return num, diff, nil
+		}
+
+		found[num] = true
+	}
+
+	return 0, 0, errors.New("no numbers found")
+}
+
+func Min(a []int) (int, error) {
+	if len(a) == 0 {
+		return 0, errors.New("length 0 array")
+	}
+
+	v := a[0]
+
+	for _, x := range a {
+		if x < v {
+			v = x
+		}
+	}
+
+	return v, nil
+}
+
+func Max(a []int) (int, error) {
+	if len(a) == 0 {
+		return 0, errors.New("length 0 array")
+	}
+
+	v := a[0]
+
+	for _, x := range a {
+		if x > v {
+			v = x
+		}
+	}
+
+	return v, nil
 }
