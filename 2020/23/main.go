@@ -9,7 +9,7 @@ import (
 func main() {
 	data := "598162734"
 	fmt.Printf("Part 1: %s\n", One(data, 100))
-	fmt.Printf("Part 2: %d\n", Two(data))
+	fmt.Printf("Part 2: %d\n", Two(data, 10000000))
 }
 
 func One(data string, moves int) string {
@@ -58,6 +58,68 @@ func One(data string, moves int) string {
 	return res
 }
 
-func Two(data string) int {
-	return 0
+type node struct {
+	val        int
+	prev, next *node
+}
+
+func Two(data string, moves int) int {
+	val, _ := strconv.Atoi(string(data[0]))
+	current := &node{val: val}
+
+	// Cache
+	cache := map[int]*node{}
+	cache[val] = current
+
+	cup := current
+	for _, r := range data[1:] {
+		val, _ := strconv.Atoi(string(r))
+		cup.next = &node{
+			val:  val,
+			prev: cup,
+		}
+		cup = cup.next
+		cache[val] = cup
+	}
+
+	for i := 10; i <= 1000000; i++ {
+		cup.next = &node{
+			val:  i,
+			prev: cup,
+		}
+		cup = cup.next
+		cache[i] = cup
+	}
+
+	// Close double linked list
+	cup.next = current
+	current.prev = cup
+
+	for i := 0; i < moves; i++ {
+		find := current.val - 1
+
+		first := current.next
+		last := current.next.next.next
+
+		for find == first.val || find == first.next.val || find == first.next.next.val || find <= 0 {
+			find--
+			if find <= 0 {
+				find = 1000000
+			}
+		}
+
+		// Remove first -> last from LL
+		current.next = last.next
+		current.next.prev = current
+
+		found := cache[find]
+		last.next = found.next
+		found.next.prev = last
+		found.next = first
+		first.prev = found
+
+		current = current.next
+	}
+
+	return cache[1].next.val * cache[1].next.next.val
 }
