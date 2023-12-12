@@ -1,10 +1,11 @@
 // --library curl --library c $(pkg-config --cflags libcurl)`
 const std = @import("std");
+const String = @import("string.zig").String;
 const cURL = @cImport({
     @cInclude("curl/curl.h");
 });
 
-pub fn curl(day: *const []u8, session: *const []u8) !void {
+pub fn curl(day: []const u8, session: []const u8) !void {
     var arena_state = std.heap.ArenaAllocator.init(std.heap.c_allocator);
     defer arena_state.deinit();
 
@@ -26,12 +27,23 @@ pub fn curl(day: *const []u8, session: *const []u8) !void {
     defer response_buffer.deinit();
 
     // setup curl options
+    var url = String.init(allocator);
+    defer url.deinit();
+    try url.concat("https://adventofcode.com/2023/day/");
+    try url.concat(day);
+    try url.concat("/input");
 
-    if (cURL.curl_easy_setopt(handle, cURL.CURLOPT_URL, "https://adventofcode.com/2023/day/" ++ day ++ "/input") != cURL.CURLE_OK)
+    if (cURL.curl_easy_setopt(handle, cURL.CURLOPT_URL, url.str()) != cURL.CURLE_OK)
         return error.CouldNotSetURL;
 
+    const cookie = String.init(allocator);
+    defer cookie.deinit();
+    try cookie.concat("session=");
+    try cookie.concat(session);
+    try cookie.concat(";");
+
     // setup session cookie
-    if (cURL.curl_easy_setopt(handle, cURL.CURLOPT_COOKIE, "session=" ++ session ++ ";") != cURL.CURLE_OK)
+    if (cURL.curl_easy_setopt(handle, cURL.CURLOPT_COOKIE, cookie.str()) != cURL.CURLE_OK)
         return error.CouldNotSetSessionCookie;
 
     // set write function callbacks
