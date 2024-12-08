@@ -1,0 +1,1 @@
+print(*(lambda d: [len(set(i + k*(j-i) for i in d for j in d if i!=j and d[i]==d[j]!="." for k in r if i + k*(j-i) in d)) for r in [[2], range(51)]])({(p+q*1j): i for p, j in enumerate(open("input.txt")) for q, i in enumerate(j.strip())}))
